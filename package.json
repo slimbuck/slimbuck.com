@@ -1,0 +1,20 @@
+{
+  "name": "slimbuck.com",
+  "version": "1.0.0",
+  "description": "Personal website of Donovan Hutchence (slimbuck)",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "node build.js",
+    "serve": "node --run build && npx --yes serve@latest dist"
+  },
+  "author": "Donovan Hutchence",
+  "license": "MIT",
+  "dependencies": {
+    "gray-matter": "^4.0.3",
+    "marked": "^12.0.2"
+  }
+}

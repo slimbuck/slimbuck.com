@@ -1,0 +1,298 @@
+/* slimbuck.com — neo-brutalist theme.
+   Bold borders, hard drop-shadows, chunky blocks, cream paper + dot grid. */
+
+:root {
+	--bg: #f5f1e6;
+	--ink: #0e0e0e;
+	--accent: #ff5c38;   /* orange-red */
+	--accent2: #2d6cff;  /* blue */
+	--accent3: #ffd23f;  /* yellow */
+	--muted: #6b6155;
+	--card: #ffffff;
+	--border-radius: 4px;
+	--border: 3px solid var(--ink);
+	--shadow: 6px 6px 0 var(--ink);
+	--shadow-sm: 3px 3px 0 var(--ink);
+}
+
+html
+{
+	height: 100%;
+}
+
+body
+{
+	width: min(820px, 100%);
+	box-sizing: border-box;
+	min-height: 100%;
+	margin: 0 auto;
+	padding: 20px 16px 60px;
+	color: var(--ink);
+	background-color: var(--bg);
+	background-image: radial-gradient(rgba(14, 14, 14, 0.09) 1.4px, transparent 1.4px);
+	background-size: 18px 18px;
+}
+
+a
+{
+	color: var(--accent2);
+	font-weight: 500;
+	text-decoration: none;
+}
+
+a:hover
+{
+	color: var(--accent);
+	text-decoration: underline;
+}
+
+/* ---- Header / nav ---- */
+
+div.header
+{
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex-wrap: wrap;
+	margin: 6px 0 28px 0;
+	padding-bottom: 18px;
+	border-bottom: var(--border);
+}
+
+div.header h1
+{
+	display: inline-block;
+	margin: 0;
+}
+
+div.header h1 a
+{
+	display: inline-block;
+	padding: 6px 16px;
+	color: var(--ink);
+	background-color: var(--accent3);
+	border: var(--border);
+	border-radius: var(--border-radius);
+	box-shadow: var(--shadow-sm);
+	letter-spacing: -0.5px;
+}
+
+div.header h1 a:hover
+{
+	text-decoration: none;
+	color: var(--ink);
+}
+
+div.header > a
+{
+	color: var(--ink);
+	font-weight: 700;
+	font-size: 0.9rem;
+	padding: 7px 13px;
+	background-color: var(--card);
+	border: var(--border);
+	border-radius: var(--border-radius);
+}
+
+div.header > a:first-of-type
+{
+	margin-left: auto;
+}
+
+div.header > a:hover
+{
+	text-decoration: none;
+	color: var(--ink);
+	transform: translate(-1px, -1px);
+	box-shadow: var(--shadow-sm);
+}
+
+div.header > a.active
+{
+	background-color: var(--accent2);
+	color: #fff;
+}
+
+div.header > a.active:hover
+{
+	color: #fff;
+	box-shadow: none;
+	transform: none;
+}
+
+/* ---- Section headings ---- */
+
+div.heading
+{
+	margin: 32px 0 14px 0;
+}
+
+div.heading h2
+{
+	display: inline-block;
+	margin: 0;
+	padding: 5px 14px;
+	color: var(--bg);
+	background-color: var(--ink);
+	border-radius: var(--border-radius);
+}
+
+/* ---- Content / text ---- */
+
+div.content
+{
+	background: transparent;
+}
+
+div.text
+{
+	color: var(--ink);
+	padding: 0 2px;
+	height: auto;
+}
+
+/* ---- Social icon buttons ---- */
+
+div.social
+{
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin: 14px 0;
+}
+
+div.social a
+{
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 46px;
+	height: 46px;
+	color: var(--ink);
+	background-color: var(--card);
+	border: var(--border);
+	border-radius: var(--border-radius);
+	box-shadow: var(--shadow-sm);
+}
+
+div.social a:hover
+{
+	text-decoration: none;
+	color: var(--ink);
+	background-color: var(--accent3);
+	transform: translate(-1px, -1px);
+}
+
+div.social a:active
+{
+	transform: translate(2px, 2px);
+	box-shadow: none;
+}
+
+div.social svg
+{
+	display: block;
+	width: 22px;
+	height: 22px;
+	fill: currentColor;
+}
+
+/* ---- Footer ---- */
+
+div.footer
+{
+	margin: 44px 0 0 0;
+	height: 8px;
+	background-color: var(--ink);
+	border-radius: var(--border-radius);
+}
+
+/* ---- Form controls (playtracer) ---- */
+
+input
+{
+	width: 60px;
+	padding: 6px;
+	margin: 0 6px;
+	color: var(--ink);
+	background-color: var(--card);
+	border: var(--border);
+	border-radius: var(--border-radius);
+	font-family: inherit;
+}
+
+input:focus
+{
+	outline: none;
+	background-color: var(--accent3);
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+	-moz-appearance: textfield;
+}
+
+button
+{
+	padding: 7px 16px;
+	color: var(--ink);
+	background-color: var(--card);
+	border: var(--border);
+	border-radius: var(--border-radius);
+	box-shadow: var(--shadow-sm);
+	cursor: pointer;
+	font-family: inherit;
+	font-weight: 700;
+}
+
+button:hover
+{
+	background-color: var(--accent2);
+	color: #fff;
+	transform: translate(-1px, -1px);
+}
+
+button:active
+{
+	transform: translate(2px, 2px);
+	box-shadow: none;
+}
+
+canvas
+{
+	margin: 12px 0;
+	background: #000;
+	max-width: 100%;
+	height: auto;
+	border: var(--border);
+	border-radius: var(--border-radius);
+}
+
+textarea
+{
+	margin: 12px 0;
+	background: var(--card);
+	color: var(--ink);
+	width: 100%;
+	max-width: 100%;
+	box-sizing: border-box;
+	border: var(--border);
+	border-radius: var(--border-radius);
+	padding: 8px;
+	font-family: inherit;
+}
+
+/* ---- Small screens ---- */
+@media (max-width: 840px)
+{
+	div.header { justify-content: center; }
+	div.header h1 { flex-basis: 100%; text-align: center; }
+	div.header > a:first-of-type { margin-left: 0; }
+}

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>Playtracer — WebAssembly path tracer · Donovan Hutchence</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="Playtracer is a simple path tracer written in C++ and compiled to WebAssembly by Donovan Hutchence (slimbuck). Render a ray-traced scene right in your browser.">
+        <meta name="author" content="Donovan Hutchence">
+        <link rel="canonical" href="https://slimbuck.com/apps/playtracer/">
+
+        <meta property="og:type" content="website">
+        <meta property="og:site_name" content="slimbuck">
+        <meta property="og:title" content="Playtracer — a WebAssembly path tracer">
+        <meta property="og:description" content="A simple path tracer written in C++ and compiled to WebAssembly. Render a ray-traced scene right in your browser.">
+        <meta property="og:url" content="https://slimbuck.com/apps/playtracer/">
+        <meta property="og:image" content="https://slimbuck.com/icon.png">
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@slimbuck7">
+
+        <link rel="stylesheet" type="text/css" href="/style.css" />
+        <link rel="stylesheet" type="text/css" href="/text.css" />
+        <link rel="icon" type="image/png" href="/icon.png">
+
+        <style>
+            html.embedded .header, html.embedded .footer, html.embedded .heading { display: none; }
+            html.embedded, html.embedded body { margin: 0; width: 100%; }
+        </style>
+        <script>if (window.self !== window.top) document.documentElement.classList.add('embedded');</script>
+    </head>
+    <body>
+        <div class="header">
+            <h1><a href="/">slimbuck.com</a></h1>
+            <a href="/">blog</a>
+            <a href="/work/">work</a>
+            <a href="/projects/" class="active">projects</a>
+            <a href="/about/">about</a>
+        </div>
+        <div class="content">
+            <div class="heading" id="playtracer"> <h2>Playtracer</h2> </div>
+            <div class="text">
+                <label for="samples">samples</label><input type="number" name="samples" id="samples" value="1"></input>
+                <label for="threads">threads</label><input type="number" name="threads" id="threads" value="1"></input>
+                <button type="button" onclick="render(document.getElementById('samples').value, document.getElementById('threads').value)">Render</button>
+                <canvas id="glCanvas" width="800px" height="500px"></canvas>
+            </div>
+            <div class="text">
+                <textarea id="log" rows="3"></textarea>
+            </div>
+
+            <div class="footer"></div>
+        </div>
+
+        <script type='text/javascript' src='playtracer_client.js'></script>
+        <script type='text/javascript' src='playtracer.js'></script>
+    </body>
+</html>

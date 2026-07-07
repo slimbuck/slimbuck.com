@@ -1,0 +1,51 @@
+name: Deploy
+
+# Deploys the site to S3 + CloudFront on every push to the deploy branch.
+# Uses GitHub OIDC to assume an AWS role (no long-lived access keys stored).
+#
+# Required repository settings:
+#   Variables (Settings > Secrets and variables > Actions > Variables):
+#     AWS_ROLE_ARN                     arn:aws:iam::<account-id>:role/<role-name>
+#     AWS_REGION                       e.g. us-east-1
+#     AWS_S3_BUCKET                    e.g. slimbuck.com
+#     AWS_CLOUDFRONT_DISTRIBUTION_ID   e.g. E123ABC...
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+
+      - name: Build
+        run: |
+          npm ci
+          npm run build
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Deploy
+        env:
+          AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
+          AWS_CLOUDFRONT_DISTRIBUTION_ID: ${{ vars.AWS_CLOUDFRONT_DISTRIBUTION_ID }}
+        run: ./deploy.sh

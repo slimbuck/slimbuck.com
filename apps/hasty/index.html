@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>HASTY 3D — a browser game · Donovan Hutchence</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="HASTY 3D is a blockout puzzle game written in C++ and OpenGL ES, compiled to WebAssembly and playable in the browser. By Donovan Hutchence (slimbuck).">
+        <meta name="author" content="Donovan Hutchence">
+        <link rel="canonical" href="https://slimbuck.com/apps/hasty/">
+
+        <meta property="og:type" content="website">
+        <meta property="og:site_name" content="slimbuck">
+        <meta property="og:title" content="HASTY 3D — a browser game">
+        <meta property="og:description" content="A blockout puzzle game written in C++/OpenGL ES, compiled to WebAssembly and playable in the browser.">
+        <meta property="og:url" content="https://slimbuck.com/apps/hasty/">
+        <meta property="og:image" content="https://slimbuck.com/icon.png">
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@slimbuck7">
+
+        <link rel="stylesheet" type="text/css" href="/style.css" />
+        <link rel="stylesheet" type="text/css" href="/text.css" />
+        <link rel="icon" type="image/png" href="/icon.png">
+
+        <style>
+            html.embedded .header, html.embedded .footer, html.embedded .heading { display: none; }
+            html.embedded, html.embedded body { margin: 0; width: 100%; }
+        </style>
+        <script>if (window.self !== window.top) document.documentElement.classList.add('embedded');</script>
+    </head>
+    <body>
+        <div class="header">
+            <h1><a href="/">slimbuck.com</a></h1>
+            <a href="/">blog</a>
+            <a href="/work/">work</a>
+            <a href="/projects/" class="active">projects</a>
+            <a href="/about/">about</a>
+        </div>
+        <div class="content">
+            <div class="heading"><h2>HASTY 3D</h2></div>
+            <div class="text"></div>
+
+            <canvas id="canvas" width="720px" height="720px" style="display: block; margin: auto;"></canvas>
+            <script type="text/javascript">
+                var Module = {
+                    canvas: (function() {
+                        return document.getElementById('canvas');
+                    })()
+                };
+            </script>
+            <script src="hasty.js"></script>
+
+            <div class="footer"></div>
+        </div>
+
+    </body>
+</html>

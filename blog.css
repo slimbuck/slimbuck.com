@@ -109,6 +109,13 @@ p.post-meta {
 	font-weight: 700;
 }
 
+/* ---- Comments (giscus) ---- */
+div.comments {
+	margin-top: 28px;
+	padding-top: 20px;
+	border-top: 3px solid var(--ink);
+}
+
 /* ---- Static content box (e.g. the about page) ---- */
 /* Matches the card look so its text aligns with the entry cards on other pages. */
 div.panel {

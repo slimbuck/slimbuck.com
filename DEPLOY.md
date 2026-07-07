@@ -119,8 +119,10 @@ role via OIDC, so there are no long-lived secrets.
   REST origin).
 - **COOP/COEP headers**: Playtracer and HASTY use threads/`SharedArrayBuffer`,
   which need `Cross-Origin-Opener-Policy: same-origin` and
-  `Cross-Origin-Embedder-Policy: require-corp`. These already appear in the live
-  response headers, so an existing response-headers policy is set — leave it be.
+  `Cross-Origin-Embedder-Policy: require-corp`. These currently apply to the
+  whole site via a response-headers policy on the default behavior. That's fine
+  unless you enable comments — see §8, which scopes them to `/apps/*` so the
+  giscus iframe can load on blog pages.
 
 ## 5. Which branch is deployed?
 
@@ -200,3 +202,58 @@ Edit `content/about.md`. The `{{social}}` placeholder is replaced with the
 social-icon row built from the `social:` list in its front matter.
 
 > Preview locally with `npm run serve` (builds, then serves `dist/`).
+
+---
+
+## 8. Comments (giscus)
+
+Blog permalink pages can show a comments thread via [giscus](https://giscus.app),
+which stores comments as **GitHub Discussions**. Each post gets its own thread
+(keyed by URL path). It's wired into `build.js` but **disabled** until the two
+IDs below are filled in.
+
+### One-time setup
+
+1. Make the `slimbuck/slimbuck.com` repo **public** and enable **Discussions**
+   (repo → Settings → General → Features → Discussions).
+2. Install the **giscus GitHub App** (https://github.com/apps/giscus) and grant
+   it access to this repo.
+3. Create a Discussions **category** for comments (e.g. "Comments", format
+   "Announcements" so only maintainers can open threads — giscus opens them on
+   demand).
+4. Go to https://giscus.app, enter the repo, and copy the generated
+   `data-repo-id` and `data-category-id`.
+5. Paste them into the `GISCUS` block in `build.js`:
+
+   ```js
+   const GISCUS = {
+       repo: 'slimbuck/slimbuck.com',
+       repoId: 'R_kgD...',        // <- from giscus.app
+       category: 'Comments',
+       categoryId: 'DIC_kwD...',  // <- from giscus.app
+       ...
+   };
+   ```
+
+6. `npm run build` — the widget now renders on blog permalink pages.
+
+### Required: scope the isolation headers (or giscus won't load)
+
+The site currently returns `Cross-Origin-Embedder-Policy: require-corp` (and
+`Cross-Origin-Opener-Policy: same-origin`) on **every** response. Under
+`require-corp` the browser refuses to load the cross-origin giscus iframe, so
+comments silently fail. Only Playtracer/HASTY actually need those headers (for
+`SharedArrayBuffer`/threads), so scope them to `/apps/*`:
+
+1. CloudFront → your distribution → **Behaviors**.
+2. Create a new behavior with **Path pattern `/apps/*`** and attach the existing
+   response-headers policy that sets COOP/COEP (leave everything else matching
+   the default behavior — same origin, cache policy, and the `slimbuck-rewrite`
+   function on viewer-request).
+3. Edit the **Default (`*`)** behavior to use a response-headers policy
+   *without* COOP/COEP (e.g. the AWS managed `SecurityHeadersPolicy`, or a
+   custom one).
+4. Create an invalidation for `/*`.
+
+After this, `/apps/*` stays cross-origin isolated while blog pages drop the
+headers so giscus (and any future third-party embed) works.

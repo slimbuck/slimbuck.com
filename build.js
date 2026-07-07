@@ -77,6 +77,45 @@ const PERSON_JSON_LD = {
     ]
 };
 
+// giscus comments (https://giscus.app), rendered on blog permalink pages.
+// Disabled until repoId AND categoryId are filled in — get both from the
+// configurator at https://giscus.app after enabling GitHub Discussions on the
+// repo and installing the giscus app. NOTE: the site's global COEP
+// (`require-corp`) header must be scoped to /apps/* first, or the browser will
+// refuse to load the giscus iframe (see DEPLOY.md §8).
+const GISCUS = {
+    repo: 'slimbuck/slimbuck.com',
+    repoId: 'MDEwOlJlcG9zaXRvcnkyNDQxNTMxMTc=',
+    category: 'General',
+    categoryId: 'DIC_kwDODo17Hc4DAs9g',
+    mapping: 'pathname',
+    theme: 'light',
+    reactionsEnabled: '0',
+    inputPosition: 'bottom',
+    lang: 'en'
+};
+
+const renderGiscus = () => {
+    if (!GISCUS.repoId || !GISCUS.categoryId) return '';
+    return `            <div class="comments">
+                <script src="https://giscus.app/client.js"
+                    data-repo="${GISCUS.repo}"
+                    data-repo-id="${GISCUS.repoId}"
+                    data-category="${GISCUS.category}"
+                    data-category-id="${GISCUS.categoryId}"
+                    data-mapping="${GISCUS.mapping}"
+                    data-strict="1"
+                    data-reactions-enabled="${GISCUS.reactionsEnabled}"
+                    data-emit-metadata="0"
+                    data-input-position="${GISCUS.inputPosition}"
+                    data-theme="${GISCUS.theme}"
+                    data-lang="${GISCUS.lang}"
+                    crossorigin="anonymous"
+                    async>
+                </script>
+            </div>`;
+};
+
 // Collections rendered from content/<name>/*.md.
 const COLLECTIONS = [
     {
@@ -365,12 +404,13 @@ const renderPermalink = (cfg, item) => {
                 <p><a href="${item.embed}" target="_blank" rel="noopener">Open full screen &#8599;</a></p>`
         : '';
 
+    const comments = cfg.name === 'blog' ? renderGiscus() : '';
     const body = `            <div class="heading"><h2>${escapeHtml(item.title)}</h2></div>
             <div class="text post">
                 ${meta}${item.html}${embed}
                 ${renderTags(item.tags)}
                 <p><a href="${cfg.indexHref}">&larr; back to ${cfg.backLabel}</a></p>
-            </div>`;
+            </div>${comments ? '\n' + comments : ''}`;
 
     return layout({
         title: `${item.title} · ${SITE.title}`,

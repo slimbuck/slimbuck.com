@@ -238,6 +238,7 @@ const EMBED_SCRIPT = `            <script>
                                 var f = document.createElement('iframe');
                                 f.src = box.getAttribute('data-src');
                                 f.title = box.getAttribute('data-title') || '';
+                                f.allowFullscreen = true;
                                 box.appendChild(f);
                             }
                         } else {
@@ -400,7 +401,7 @@ const renderPermalink = (cfg, item) => {
         : '';
     const embed = item.embed
         ? `
-                <div class="app-embed" style="height:${item.embedHeight}px"><iframe src="${item.embed}" title="${escapeHtml(item.title)}"></iframe></div>
+                <div class="app-embed" style="height:${item.embedHeight}px"><iframe src="${item.embed}" title="${escapeHtml(item.title)}" allowfullscreen></iframe></div>
                 <p><a href="${item.embed}" target="_blank" rel="noopener">Open full screen &#8599;</a></p>`
         : '';
 

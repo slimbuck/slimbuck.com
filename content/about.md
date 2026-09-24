@@ -20,9 +20,9 @@ I enjoy working on realtime tools and applications and have spent the last two y
 
 ### About this site
 
-Now that LLMs can write anything for us, I decided it's the perfect opportunity to learn how to write for myself. In the process I hope to _find my voice_.
+Now that LLMs can write everything for us, I decided it's the perfect opportunity to learn how to write for myself. In the process I hope to _find my written voice_.
 
-So while this website has been built with the help of Opus, all the words you will read are all mine, for better or worse.
+So while this website is built (and deployed, and styled) with the help of opus and fable, all the words you read are mine, for better or worse.
 
 ---
 

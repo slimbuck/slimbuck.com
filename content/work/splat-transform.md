@@ -3,7 +3,7 @@ title: "splat-transform"
 order: 3
 description: "CLI and library for converting and editing 3D Gaussian splats."
 ---
-Wrote this CLI and library for converting and editing 3D Gaussian splats. Alongside format
+I wrote this CLI and library for converting and editing 3D Gaussian splats. Alongside format
 conversion, it includes:
 
 - **Collision voxel generation** — a sparse voxel octree for collision detection.

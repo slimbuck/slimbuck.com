@@ -17,11 +17,7 @@ My console comprises:
 - RGBerry (PI to scart converter)
 - 14" CRT TV
 
-The software is an agent-made c application running on Trixie Lite.
-
-I have a cool dashboard running on the laptop which shows the console status, allows me to create and edit levels etc.
-
-I call the platform Chirky.
+Check the repo for more details:
 
 https://github.com/slimbuck/chirky
 

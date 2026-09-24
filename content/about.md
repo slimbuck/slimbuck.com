@@ -14,7 +14,7 @@ This is the personal website of Donovan Hutchence, aka **slimbuck**.
 
 I am a software engineer and member of the [PlayCanvas](https://www.playcanvas.com) team at **Snap**.
 
-I enjoy working on realtime tools and applications and have spent the last two years knee-deep in all aspects of [gaussian splatting](https://superspl.at).
+I work on realtime tools and applications and spent the last two years knee-deep in all aspects of [gaussian splatting](https://superspl.at).
 
 ---
 

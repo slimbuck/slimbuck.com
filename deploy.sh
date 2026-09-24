@@ -40,8 +40,16 @@ find dist -name '*.wasm' | while read -r wasm; do
 done
 
 echo "==> Invalidating CloudFront cache"
-aws cloudfront create-invalidation \
+invalidation_id=$(aws cloudfront create-invalidation \
     --distribution-id "${AWS_CLOUDFRONT_DISTRIBUTION_ID}" \
-    --paths "/*" >/dev/null
+    --paths "/*" --query 'Invalidation.Id' --output text)
+
+echo "==> Waiting for cache invalidation"
+aws cloudfront wait invalidation-completed \
+    --distribution-id "${AWS_CLOUDFRONT_DISTRIBUTION_ID}" \
+    --id "$invalidation_id"
+
+echo "==> Checking deployed Chirky assets"
+node tools/check-chirky.js https://slimbuck.com/
 
 echo "==> Done. https://slimbuck.com/"

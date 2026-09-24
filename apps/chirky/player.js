@@ -64,10 +64,15 @@ async function checked(url){const response=await fetch(url,{cache:"no-store"});i
 async function start(){
   if(!Object.hasOwn(titles,id))throw new Error("Unknown game");
   const files=await (await checked("assets.json")).json();
+  const configs=id==="launcher"?{}:await (await checked("configs.json")).json();
   const {default:create}=await import(`./${id}.js`);
   runtime=await create({canvas,onSound:playSound,onLaunch:index=>{leaving=true;location.href=`?game=${ids[index]}`;},printErr:message=>console.warn(message)});
   await Promise.all(files.filter(file=>id==="launcher"?file.startsWith("assets/launcher/"):file.startsWith(`games/${id}/`)).map(async file=>{
-    const bytes=new Uint8Array(await (await checked("runtime/"+file)).arrayBuffer());
+    let bytes;
+    if(file.endsWith(".conf")){
+      if(typeof configs[file]!=="string")throw new Error(`Missing game configuration: ${file}`);
+      bytes=new TextEncoder().encode(configs[file]);
+    }else bytes=new Uint8Array(await (await checked("runtime/"+file)).arrayBuffer());
     runtime.FS.mkdirTree("/"+file.slice(0,file.lastIndexOf("/")));runtime.FS.writeFile("/"+file,bytes);
     if(file.endsWith(".wav"))sounds.set(file,bytes);
   }));

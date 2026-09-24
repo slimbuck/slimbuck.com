@@ -35,4 +35,12 @@ Node.js available. Copy the contents of Chirky's `build/web/` into this site's
 Keep that destination in sync if assets are renamed or removed. Rebuild this
 site and check both games before committing. No game server is required.
 
+The website player loads game configurations from `configs.json`, which
+`build.js` generates from the original `.conf` files. The live CDN returns 404
+for `.conf` URLs. Preserve this website-specific loading code when refreshing
+`player.js` from Chirky; the C games still receive the original filesystem names.
+Deployment waits for cache invalidation and runs `tools/check-chirky.js` to
+verify all public game resources against the build. To check a local preview:
+`node tools/check-chirky.js http://127.0.0.1:8765/`.
+
 See [DEPLOY.md](DEPLOY.md) for content examples, manual deployment, and AWS setup.

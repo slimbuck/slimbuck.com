@@ -3,7 +3,8 @@ title: "HASTY 3D"
 order: 2
 description: "A blockout puzzle game written in C++/OpenGL ES, compiled to WebAssembly."
 embed: "/apps/hasty/"
-embedHeight: 760
+embedAspect: 1
+requiresIsolation: true
 ---
 I wrote this simple blockout-type game and published to the [Google Play Store](https://play.google.com/store/apps/details?id=com.slimbuck.hasty).
 

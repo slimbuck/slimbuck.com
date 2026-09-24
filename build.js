@@ -1,7 +1,7 @@
 // Static site build step.
 //
 // Reads Markdown content from content/{blog,work,projects} and content/about.md,
-// renders each collection into collapsible index pages plus per-entry permalink
+// renders each collection into a contents list and selected entry, plus permalink
 // pages using the same look as the rest of the site, and (re)generates rss.xml
 // and sitemap.xml. The generated pages plus the hand-authored static assets are
 // assembled into dist/, which is the complete, self-contained deploy root.
@@ -77,26 +77,29 @@ const PERSON_JSON_LD = {
     ]
 };
 
-// giscus comments (https://giscus.app), rendered on blog permalink pages.
-// Disabled until repoId AND categoryId are filled in — get both from the
+// giscus comments (https://giscus.app), shared by both views of a blog entry.
+// Disabled until repoId AND categoryId are filled in â€” get both from the
 // configurator at https://giscus.app after enabling GitHub Discussions on the
 // repo and installing the giscus app. NOTE: the site's global COEP
 // (`require-corp`) header must be scoped to /apps/* first, or the browser will
-// refuse to load the giscus iframe (see DEPLOY.md §8).
+// refuse to load the giscus iframe (see DEPLOY.md Â§8).
 const GISCUS = {
     repo: 'slimbuck/slimbuck.com',
     repoId: 'MDEwOlJlcG9zaXRvcnkyNDQxNTMxMTc=',
     category: 'General',
     categoryId: 'DIC_kwDODo17Hc4DAs9g',
-    mapping: 'pathname',
+    mapping: 'specific',
     theme: 'light',
     reactionsEnabled: '0',
     inputPosition: 'bottom',
     lang: 'en'
 };
 
-const renderGiscus = () => {
+const renderGiscus = (item) => {
     if (!GISCUS.repoId || !GISCUS.categoryId) return '';
+    // Match giscus's original pathname mapping: strip the leading slash and extension.
+    // The landing page must use the post's thread, never a separate root-page thread.
+    const term = new URL(item.url).pathname.slice(1).replace(/\.\w+$/, '');
     return `            <div class="comments">
                 <script src="https://giscus.app/client.js"
                     data-repo="${GISCUS.repo}"
@@ -104,6 +107,7 @@ const renderGiscus = () => {
                     data-category="${GISCUS.category}"
                     data-category-id="${GISCUS.categoryId}"
                     data-mapping="${GISCUS.mapping}"
+                    data-term="${escapeHtml(term)}"
                     data-strict="1"
                     data-reactions-enabled="${GISCUS.reactionsEnabled}"
                     data-emit-metadata="0"
@@ -128,12 +132,10 @@ const COLLECTIONS = [
         permalinkDir: 'blog',
         permalinkBase: '/blog',
         canonical: SITE.url + '/',
-        indexHref: '/',
         heading: 'Blog',
         intro: 'Occasional notes on graphics, games and software engineering.',
-        indexTitle: 'Donovan Hutchence (slimbuck) — Blog',
+        indexTitle: 'Donovan Hutchence (slimbuck) â€” Blog',
         indexDescription: SITE.description,
-        backLabel: 'the blog',
         sitemapPriority: '1.0'
     },
     {
@@ -144,12 +146,10 @@ const COLLECTIONS = [
         permalinkDir: 'work',
         permalinkBase: '/work',
         canonical: SITE.url + '/work/',
-        indexHref: '/work/',
         heading: 'Work',
         intro: 'I am fortunate to work on open source projects much of time at PlayCanvas. These are some of those projects.',
-        indexTitle: 'Work — Donovan Hutchence (slimbuck)',
+        indexTitle: 'Work â€” Donovan Hutchence (slimbuck)',
         indexDescription: 'Open-source graphics and Gaussian splatting projects Donovan Hutchence works on at PlayCanvas.',
-        backLabel: 'all work',
         sitemapPriority: '0.8'
     },
     {
@@ -161,12 +161,10 @@ const COLLECTIONS = [
         permalinkDir: 'projects',
         permalinkBase: '/projects',
         canonical: SITE.url + '/projects/',
-        indexHref: '/projects/',
         heading: 'Projects',
         intro: 'Interactive experiments that run in your browser.',
-        indexTitle: 'Projects — Donovan Hutchence (slimbuck)',
+        indexTitle: 'Projects â€” Donovan Hutchence (slimbuck)',
         indexDescription: 'Browser-based graphics experiments by Donovan Hutchence, written in C++ and compiled to WebAssembly.',
-        backLabel: 'all projects',
         sitemapPriority: '0.8'
     }
 ];
@@ -226,32 +224,10 @@ const jsonLdScript = (obj) =>
     JSON.stringify(obj, null, 2) +
     '\n        </script>';
 
-// Lazily loads an embedded app into its iframe the first time its entry is
-// expanded, and frees it (unloading WASM/threads) when collapsed.
-const EMBED_SCRIPT = `            <script>
-                document.querySelectorAll('details.post-entry').forEach(function (d) {
-                    d.addEventListener('toggle', function () {
-                        var box = d.querySelector('.app-embed');
-                        if (!box) return;
-                        if (d.open) {
-                            if (!box.querySelector('iframe')) {
-                                var f = document.createElement('iframe');
-                                f.src = box.getAttribute('data-src');
-                                f.title = box.getAttribute('data-title') || '';
-                                f.allowFullscreen = true;
-                                box.appendChild(f);
-                            }
-                        } else {
-                            box.innerHTML = '';
-                        }
-                    });
-                });
-            </script>`;
-
 const NAV = [
     { href: '/', label: 'blog', key: 'home' },
-    { href: '/work/', label: 'work', key: 'work' },
     { href: '/projects/', label: 'projects', key: 'projects' },
+    { href: '/work/', label: 'work', key: 'work' },
     { href: '/about/', label: 'about', key: 'about' }
 ];
 
@@ -321,6 +297,8 @@ const readCollection = (cfg) => {
                 tags: data.tags || [],
                 embed: data.embed || null,
                 embedHeight: data.embedHeight || 500,
+                embedAspect: data.embedAspect || null,
+                requiresIsolation: data.requiresIsolation === true,
                 html: marked.parse(content),
                 url: `${SITE.url}${cfg.permalinkBase}/${slug}.html`
             };
@@ -340,34 +318,55 @@ const renderTags = (tags) =>
         ? `<div class="post-tags">${tags.map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join(' ')}</div>`
         : '';
 
-// A single collapsible entry on a collection index page.
+// A compact contents list stays above the selected entry on every collection page.
+// Ordinary links preserve sharing, browser history and operation without JavaScript.
+const renderEntryList = (cfg, items, selected) => items.length ? `
+            <nav class="entry-list" aria-label="${escapeHtml(cfg.name)} entries">
+                <ul>${items.map((item) => `
+                    <li><a href="${cfg.permalinkBase}/${item.slug}.html"${item.slug === selected ? ' aria-current="true"' : ''}>${escapeHtml(item.title)}</a>${item.date ? ` <span class="entry-date">${formatDate(item.date)}</span>` : ''}</li>`).join('')}
+                </ul>
+            </nav>` : '';
+
 const renderEntry = (cfg, item) => {
-    const meta = item.date
-        ? `<span class="post-entry-date">${formatDate(item.date)}</span>`
-        : '';
-    const embed = item.embed
-        ? `
-                    <div class="app-embed" style="height:${item.embedHeight}px" data-src="${item.embed}" data-title="${escapeHtml(item.title)}"></div>
-                    <p><a href="${item.embed}" target="_blank" rel="noopener">Open full screen &#8599;</a></p>`
-        : '';
-    return `            <details class="post-entry" id="${item.slug}">
-                <summary><span class="post-entry-title">${escapeHtml(item.title)}</span>${meta}</summary>
-                <div class="text post">
-${item.html}${embed}
-                    ${renderTags(item.tags)}
-                    <p><a href="${cfg.permalinkBase}/${item.slug}.html">Permalink</a></p>
+    const meta = item.date ? `<p class="post-meta">Posted ${formatDate(item.date)}</p>` : '';
+    const player = item.embed ? `
+                <div class="app-embed" style="${item.embedAspect ? `aspect-ratio:${item.embedAspect}` : `height:${item.embedHeight}px`}"><iframe src="${item.embed}" title="${escapeHtml(item.title)}" allowfullscreen></iframe></div>
+                <p><a href="${item.embed}" target="_blank" rel="noopener">Open in a new tab &#8599;</a></p>` : '';
+    // Threaded games cannot run inside a non-isolated parent page. Keep a
+    // working standalone launch link until hosting enables isolation here too.
+    const embed = item.requiresIsolation ? `
+                <div class="isolated-player">
+                    <div class="game-launch"><p>This game opens in its own tab.</p><p><a href="${item.embed}" target="_blank" rel="noopener">Play ${escapeHtml(item.title)} &#8599;</a></p></div>
+                    <template>${player}</template>
                 </div>
-            </details>`;
+                <script>
+                    if (window.crossOriginIsolated) {
+                        const container = document.currentScript.previousElementSibling;
+                        container.replaceChildren(container.querySelector('template').content.cloneNode(true));
+                    }
+                </script>` : player;
+    const comments = cfg.name === 'blog' ? renderGiscus(item) : '';
+    return `            <article class="selected-entry">
+                <div class="heading"><h2>${escapeHtml(item.title)}</h2></div>
+                <div class="text post">
+                    ${meta}${item.html}${embed}
+                    ${renderTags(item.tags)}
+                </div>
+            </article>${comments ? '\n' + comments : ''}`;
+};
+
+const renderCollectionIntro = (cfg) => {
+    const rssLink = cfg.rss ? ' <a href="/rss.xml">RSS feed</a>' : '';
+    return `            <div class="text">
+                <p>${cfg.intro}${rssLink}</p>
+            </div>`;
 };
 
 const renderIndex = (cfg, items) => {
-    const entries = items.map((i) => renderEntry(cfg, i)).join('\n');
-    const rssLink = cfg.rss ? ' <a href="/rss.xml">RSS feed</a>' : '';
-    const trailing = cfg.embeds ? `\n${EMBED_SCRIPT}` : '';
-    const body = `            <div class="text">
-                <p>${cfg.intro}${rssLink}</p>
-            </div>
-${entries || '            <div class="text">Nothing here yet — check back soon.</div>'}${trailing}`;
+    const selected = items[0];
+    const body = `${renderCollectionIntro(cfg)}
+${renderEntryList(cfg, items, selected?.slug)}
+${selected ? renderEntry(cfg, selected) : '            <div class="text">Nothing here yet â€” check back soon.</div>'}`;
 
     return layout({
         title: cfg.indexTitle,
@@ -379,7 +378,7 @@ ${entries || '            <div class="text">Nothing here yet — check back soon
     });
 };
 
-const renderPermalink = (cfg, item) => {
+const renderPermalink = (cfg, item, items) => {
     let headExtra = '';
     if (cfg.name === 'blog') {
         headExtra = jsonLdScript({
@@ -396,25 +395,12 @@ const renderPermalink = (cfg, item) => {
         });
     }
 
-    const meta = item.date
-        ? `<p class="post-meta">Posted ${formatDate(item.date)}</p>\n`
-        : '';
-    const embed = item.embed
-        ? `
-                <div class="app-embed" style="height:${item.embedHeight}px"><iframe src="${item.embed}" title="${escapeHtml(item.title)}" allowfullscreen></iframe></div>
-                <p><a href="${item.embed}" target="_blank" rel="noopener">Open full screen &#8599;</a></p>`
-        : '';
-
-    const comments = cfg.name === 'blog' ? renderGiscus() : '';
-    const body = `            <div class="heading"><h2>${escapeHtml(item.title)}</h2></div>
-            <div class="text post">
-                ${meta}${item.html}${embed}
-                ${renderTags(item.tags)}
-                <p><a href="${cfg.indexHref}">&larr; back to ${cfg.backLabel}</a></p>
-            </div>${comments ? '\n' + comments : ''}`;
+    const body = `${renderCollectionIntro(cfg)}
+${renderEntryList(cfg, items, item.slug)}
+${renderEntry(cfg, item)}`;
 
     return layout({
-        title: `${item.title} · ${SITE.title}`,
+        title: `${item.title} Â· ${SITE.title}`,
         description: item.description,
         canonical: item.url,
         headExtra,
@@ -437,7 +423,7 @@ ${rendered}
                 </div>
             </div>`;
     return layout({
-        title: `${data.title || 'About'} — Donovan Hutchence (slimbuck)`,
+        title: `${data.title || 'About'} â€” Donovan Hutchence (slimbuck)`,
         description: data.description || SITE.description,
         canonical: SITE.url + '/about/',
         headExtra: data.person ? jsonLdScript(PERSON_JSON_LD) : '',
@@ -538,7 +524,7 @@ const main = () => {
         for (const item of items) {
             fs.writeFileSync(
                 out(cfg.permalinkDir, `${item.slug}.html`),
-                renderPermalink(cfg, item)
+                renderPermalink(cfg, item, items)
             );
         }
     }

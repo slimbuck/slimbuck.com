@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build": "node build.js",
-    "serve": "node --run build && npx --yes serve@latest dist"
+    "serve": "node --run build && node tools/serve.js"
   },
   "author": "Donovan Hutchence",
   "license": "MIT",

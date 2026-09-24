@@ -194,22 +194,40 @@ Your Markdown content here.
 ```
 
 A `projects` entry can embed an interactive app that loads when its entry is
-expanded by adding `embed: /apps/<name>/` (and optional `embedHeight: 500`).
+selected by adding `embed: /apps/<name>/` (and optional `embedHeight: 500`).
+Blog, work and projects pages list their entries at the top, with the selected
+entry below. Collection landing pages show the first entry by default; selecting
+another follows its permalink and unloads the previous app.
 
 ### About page
 
 Edit `content/about.md`. The `{{social}}` placeholder is replaced with the
 social-icon row built from the `social:` list in its front matter.
 
-> Preview locally with `npm run serve` (builds, then serves `dist/`).
+> Preview locally with `npm run serve` (builds, then serves `dist/` at
+> `http://127.0.0.1:8772`; override with the `PORT` environment variable).
+> This server supplies isolation headers for `/apps/*` and `/projects/*`.
+> A plain static server without those headers cannot run HASTY's threaded WASM.
+
+HASTY uses `embedAspect: 1` for a responsive square player and
+`requiresIsolation: true`. If the parent project page is not isolated, it shows
+a standalone Play link instead of starting a broken iframe. To enable inline
+play in production, add a CloudFront **`/projects/*`** behavior with the same
+COOP/COEP response-headers policy, origin, cache policy and viewer-request
+rewrite function as `/apps/*`, then invalidate `/projects/*`. Keep blog/default
+pages non-isolated for giscus. The preview enables this configuration; the live
+site uses the standalone fallback until the CloudFront behavior is configured.
 
 ---
 
 ## 8. Comments (giscus)
 
-Blog permalink pages can show a comments thread via [giscus](https://giscus.app),
+Blog entries can show a comments thread via [giscus](https://giscus.app),
 which stores comments as **GitHub Discussions**. Each post gets its own thread
-(keyed by URL path). It's wired into `build.js` but **disabled** until the two
+on both the landing page and its permalink. An explicit term derived from the
+post's permalink preserves the original pathname-based thread (for example,
+`blog/hello-world`), so comments do not split between the two views.
+It's wired into `build.js` but **disabled** until the two
 IDs below are filled in.
 
 ### One-time setup

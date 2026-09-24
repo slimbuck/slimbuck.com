@@ -23,7 +23,13 @@
 
         <style>
             html.embedded .header, html.embedded .footer, html.embedded .heading { display: none; }
-            html.embedded, html.embedded body { margin: 0; width: 100%; }
+            #canvas { display: block; margin: auto; width: min(100%, 720px) !important; height: auto !important; aspect-ratio: 1; box-sizing: border-box; }
+            #game-status { text-align: center; }
+            #canvas[hidden], #game-status[hidden] { display: none; }
+            html.embedded, html.embedded body { margin: 0; padding: 0; width: 100%; height: 100%; min-height: 0; overflow: hidden; background: #000; }
+            html.embedded .content { width: 100%; height: 100%; display: grid; place-items: center; }
+            html.embedded #canvas { width: min(100vw, 100vh, 720px) !important; height: auto !important; border: 0; border-radius: 0; }
+            html.embedded #game-status { color: white; padding: 16px; }
         </style>
         <script>if (window.self !== window.top) document.documentElement.classList.add('embedded');</script>
     </head>
@@ -31,23 +37,15 @@
         <div class="header">
             <h1><a href="/">slimbuck.com</a></h1>
             <a href="/">blog</a>
-            <a href="/work/">work</a>
             <a href="/projects/" class="active">projects</a>
+            <a href="/work/">work</a>
             <a href="/about/">about</a>
         </div>
         <div class="content">
             <div class="heading"><h2>HASTY 3D</h2></div>
-            <div class="text"></div>
-
-            <canvas id="canvas" width="720px" height="720px" style="display: block; margin: auto;"></canvas>
-            <script type="text/javascript">
-                var Module = {
-                    canvas: (function() {
-                        return document.getElementById('canvas');
-                    })()
-                };
-            </script>
-            <script src="hasty.js"></script>
+            <p id="game-status" role="status">Loading HASTY…</p>
+            <canvas id="canvas" width="720" height="720" tabindex="0" aria-label="HASTY 3D game. Enter to select, arrow keys to move, Space to drop." hidden></canvas>
+            <script src="player.js"></script>
 
             <div class="footer"></div>
         </div>

@@ -8,7 +8,7 @@ embedHeight: 860
 ---
 After playing Mario on an original NES console in France, I was inspired to develop my own console.
 
-I wondered whether it's still possible to get that immediate-response feel using (partly) modern hardware. And with agents all the grunt work becomes a doddle.
+I wondered whether it's still possible to get that immediate-response feel using (partly) modern hardware.
 
 My console comprises:
 - Raspberry PI 3 B+
@@ -17,7 +17,7 @@ My console comprises:
 - RGBerry (PI to scart converter)
 - 14" CRT TV
 
-Check the repo for more details:
+Check the github repo for more details:
 
 https://github.com/slimbuck/chirky
 

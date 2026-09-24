@@ -31,7 +31,7 @@ function mask(){
 function setPaused(value){
   paused=value;keys.clear();touch.clear();pending=0;last=0;accumulator=0;
   $("#pause").textContent=paused?"Resume":"Pause";
-  status.textContent=(paused?"Paused · ":"")+titles[id];
+  status.textContent=(paused?"Paused Ã‚Â· ":"")+titles[id];
   if(paused)stopSounds();else canvas.focus();
 }
 canvas.addEventListener("keydown",event=>{if(event.code in bindings){event.preventDefault();if(event.repeat && event.code==="Escape")return;if(!event.repeat)pending|=1<<bindings[event.code];keys.add(event.code);unlock();}});
@@ -84,7 +84,10 @@ async function start(){
   }
   if(!runtime.ccall("web_init","number",["string"],[config]))throw new Error("Could not initialise the game or WebGL display");
   ready=true;
-  status.textContent=titles[id];canvas.focus();requestAnimationFrame(frame);
+  status.textContent=titles[id];
+  // Embedded games must not steal focus or scroll past the project list.
+  if(window===window.top)canvas.focus({preventScroll:true});
+  requestAnimationFrame(frame);
 }
 window.addEventListener("pagehide",()=>{leaving=true;stopSounds();if(ready)runtime._web_destroy();audio?.close();});
 window.addEventListener("pageshow",event=>{if(event.persisted)location.reload();});

@@ -131,64 +131,51 @@ div.panel > .text.post {
 	padding: 0;
 }
 
-/* ---- Collapsible entries ---- */
-
-details.post-entry {
-	margin: 14px 0;
-	background: var(--card);
-	border: var(--border);
-	border-radius: var(--border-radius);
-	box-shadow: var(--shadow);
+/* ---- Contents list above the selected entry ---- */
+.entry-list {
+    margin: 14px 0 26px;
+    padding-bottom: 18px;
+    border-bottom: var(--border);
+}
+.entry-list ul {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px 16px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.entry-list li {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    margin: 0;
+}
+.entry-list a {
+    display: inline-block;
+    padding: 4px 8px;
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 700;
+    border-radius: var(--border-radius);
+}
+.entry-list a[aria-current] {
+    color: var(--ink);
+    background: var(--accent3);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+.entry-list a:focus-visible {
+    outline: 3px solid var(--accent2);
+    outline-offset: 2px;
+}
+.entry-date {
+    color: var(--muted);
+    font-size: 0.82em;
 }
 
-details.post-entry > summary {
-	display: flex;
-	align-items: center;
-	gap: 12px;
-	padding: 12px 16px;
-	cursor: pointer;
-	list-style: none;
-}
-
-details.post-entry > summary::-webkit-details-marker {
-	display: none;
-}
-
-details.post-entry > summary::after {
-	content: "+";
-	font-family: "Archivo Black", sans-serif;
-	font-size: 1.1rem;
-	line-height: 1;
-	color: var(--ink);
-}
-
-details.post-entry[open] > summary::after {
-	content: "\2013"; /* en dash */
-}
-
-details.post-entry[open] > summary {
-	background: var(--accent3);
-	border-bottom: var(--border);
-}
-
-.post-entry-title {
-	flex: 1 1 auto;
-	font-family: "Space Grotesk", sans-serif;
-	font-weight: 700;
-	font-size: 1.1rem;
-}
-
-.post-entry-date {
-	color: var(--muted);
-	font-size: 0.82em;
-	font-weight: 500;
-}
-
-details.post-entry > .text.post {
-	padding: 12px 16px 8px 16px;
-}
-
-/* ---- On-demand embedded apps (playtracer / hasty) ---- */
+/* ---- Selected embedded app ---- */
 
 .app-embed {
 	margin: 14px 0;

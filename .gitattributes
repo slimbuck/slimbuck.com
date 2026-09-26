@@ -1,0 +1,2 @@
+# Preserve the exact tested Chirky build across Windows and deployment checkouts.
+apps/chirky/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

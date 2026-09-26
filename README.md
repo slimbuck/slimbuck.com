@@ -27,20 +27,26 @@ front-matter field adds a playable app; its static files live in `apps/name/`.
 
 ## Refresh the Chirky games
 
-The playable build in `apps/chirky/` is copied from the
-[Chirky repository](https://github.com/slimbuck/chirky), currently commit
-`ebb3ad4`. Make game changes there, then run `make web` with Emscripten and
-Node.js available. Copy the contents of Chirky's `build/web/` into this site's
-`apps/chirky/`, including `runtime/`, the asset manifest, and all JS/WASM files.
-Keep that destination in sync if assets are renamed or removed. Rebuild this
-site and check both games before committing. No game server is required.
+The playable build in `apps/chirky/` is owned and built by the
+[Chirky repository](https://github.com/slimbuck/chirky). Its `build.json` records
+the source commit, uncommitted-change status and exact file hashes. Do not edit
+the bundled player here: configuration bundling and iframe focus behaviour are
+part of Chirky's shared browser build.
 
-The website player loads game configurations from `configs.json`, which
-`build.js` generates from the original `.conf` files. The live CDN returns 404
-for `.conf` URLs. Preserve this website-specific loading code when refreshing
-`player.js` from Chirky; the C games still receive the original filesystem names.
+From the Chirky checkout, run `make web` and
+`node tools/export-web.cjs ../slimbuck.com` (adjust the destination path).
+On Windows, build with `wsl make web NODE=node.exe`. The export runs both games'
+desktop/mobile browser checks against the standalone build before replacing
+this site's `apps/chirky/` with identical files. It does not commit or publish.
+Commit Chirky first and rebuild when preparing a release from a clean revision.
+
+Here, run `npm run build` and preview/check the result before committing and
+pushing. This site's build copies the entire bundle unchanged, including
+`configs.json`; `.gitattributes` prevents Git newline conversion from altering
+the tested bytes. No game server is required.
+
 Deployment waits for cache invalidation and runs `tools/check-chirky.js` to
 verify all public game resources against the build. To check a local preview:
-`node tools/check-chirky.js http://127.0.0.1:8765/`.
+`node tools/check-chirky.js http://127.0.0.1:8772/`.
 
 See [DEPLOY.md](DEPLOY.md) for content examples, manual deployment, and AWS setup.

@@ -506,14 +506,6 @@ const main = () => {
 
     copyStaticAssets();
 
-    // The live CDN does not serve .conf URLs. Keep the C filesystem names,
-    // but transport the public game configuration as a single JSON resource.
-    const chirky = out('apps', 'chirky');
-    const chirkyAssets = JSON.parse(fs.readFileSync(path.join(chirky, 'assets.json'), 'utf8'));
-    const configs = Object.fromEntries(chirkyAssets.filter((file) => file.endsWith('.conf'))
-        .map((file) => [file, fs.readFileSync(path.join(chirky, 'runtime', file), 'utf8')]));
-    fs.writeFileSync(path.join(chirky, 'configs.json'), JSON.stringify(configs));
-
     const collections = COLLECTIONS.map((cfg) => ({ cfg, items: readCollection(cfg) }));
 
     for (const { cfg, items } of collections) {

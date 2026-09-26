@@ -4,6 +4,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 
 const root = fileURLToPath(new URL('../dist/apps/chirky/', import.meta.url));
 const base = new URL('apps/chirky/', process.argv[2] || 'http://127.0.0.1:8765/');
@@ -17,6 +18,11 @@ async function check(file) {
 }
 const assets = JSON.parse(await check('assets.json'));
 const configs = JSON.parse(await check('configs.json'));
+const build = JSON.parse(await check('build.json'));
+for (const [file, digest] of Object.entries(build.files)) {
+    const bytes = await fs.readFile(path.join(root, file));
+    assert.equal(createHash('sha256').update(bytes).digest('hex'), digest, `${file}: build identity mismatch`);
+}
 for (const file of assets.filter((name) => name.endsWith('.conf'))) {
     assert.equal(configs[file], await fs.readFile(path.join(root, 'runtime', file), 'utf8'), file);
 }
@@ -24,4 +30,4 @@ const files = ['index.html', 'player.js', 'style.css',
     ...['launcher', 'phosphor-run', 'rosey-chop', 'hardware-test'].flatMap((id) => [id + '.js', id + '.wasm']),
     ...assets.filter((file) => !file.endsWith('.conf')).map((file) => 'runtime/' + file)];
 for (let i = 0; i < files.length; i += 6) await Promise.all(files.slice(i, i + 6).map(check));
-console.log(`Chirky verified: ${files.length + 2} public files and ${Object.keys(configs).length} game configurations.`);
+console.log(`Chirky verified: ${files.length + 3} public files and ${Object.keys(configs).length} game configurations. Source: ${build.sourceCommit}${build.sourceDirty ? ' (uncommitted changes)' : ''}.`);

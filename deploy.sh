@@ -19,7 +19,8 @@ set -euo pipefail
 : "${AWS_CLOUDFRONT_DISTRIBUTION_ID:?Set AWS_CLOUDFRONT_DISTRIBUTION_ID to your distribution id}"
 
 echo "==> Building site"
-npm ci --silent || npm install --silent
+npm ci --silent
+npm test
 npm run build
 
 echo "==> Syncing dist/ to s3://${AWS_S3_BUCKET}"

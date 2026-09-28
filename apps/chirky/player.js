@@ -1,11 +1,53 @@
 const $=selector=>document.querySelector(selector);
-const ids=["phosphor-run","rosey-chop","hardware-test"];
-const titles={"launcher":"Launcher","phosphor-run":"Phosphor Run","rosey-chop":"Rosey Chop","hardware-test":"Hardware Test"};
 const params=new URLSearchParams(location.search),id=params.get("game") || "launcher";
 const canvas=$("#screen"),status=$("#status");
+let catalog=[],ids=[],titles={launcher:"Launcher"},selectedGame=null;
 let runtime,audio,muted=false,paused=false,leaving=false,last=0,accumulator=0,pending=0,selectHeld=false,ready=false;
 const keys=new Set(),touch=new Map(),sounds=new Map(),sources=new Set();
 const assetSounds=new Map();
+let director=null;
+function directorSession(){return crypto.randomUUID?.() || `web-${Date.now()}-${Math.random().toString(16).slice(2)}`;}
+async function syncDirector(){
+  if(!director || director.syncing || leaving)return;
+  director.syncing=true;
+  try{
+    const response=await fetch(`${director.endpoint}/v1/sync`,{
+      method:"POST",headers:{"Content-Type":"application/json","Accept":"text/plain"},
+      body:JSON.stringify({protocol:1,game:director.game,world:director.world,session:director.session,
+        last_revision:director.revision,events:director.events})
+    });
+    if(!response.ok)throw new Error(`HTTP ${response.status}`);
+    const acknowledged=Number(response.headers.get("X-Chirky-Ack"));
+    const revision=Number(response.headers.get("X-Chirky-Revision"));
+    const state=await response.text();
+    if(!Number.isSafeInteger(acknowledged) || !Number.isSafeInteger(revision))throw new Error("Invalid director response");
+    director.events=director.events.filter(item=>item.sequence>acknowledged);
+    if(revision>director.revision && state){director.revision=revision;director.state=state;}
+    director.lastError="";
+  }catch(error){
+    if(director && director.lastError!==error.message){director.lastError=error.message;console.warn("World director offline:",error.message);}
+  }finally{if(director)director.syncing=false;}
+}
+function onDirectorConnect(endpoint,game,world){
+  onDirectorDisconnect();
+  try{
+    const parsed=new URL(endpoint,location.href);if(parsed.protocol!=="http:")return false;
+    director={endpoint:parsed.href.replace(/\/+$/,"").replace(/\/v1\/sync$/,""),game,world,
+      session:directorSession(),events:[],nextSequence:1,revision:0,state:"",syncing:false,lastError:"",timer:0};
+    director.timer=setInterval(syncDirector,1000);syncDirector();return true;
+  }catch{return false;}
+}
+function onDirectorDisconnect(){if(director?.timer)clearInterval(director.timer);director=null;}
+function onDirectorEvent(json){
+  if(!director || director.events.length>=32)return false;
+  try{const event=JSON.parse(json);if(!event || Array.isArray(event) || typeof event!=="object")return false;
+    director.events.push({sequence:director.nextSequence++,event});syncDirector();return true;
+  }catch{return false;}
+}
+function onDirectorState(afterRevision){
+  return director && director.revision>afterRevision && director.state?
+    {revision:director.revision,text:director.state}:null;
+}
 function prepareAssetSound(handle,pointer,size,rate,channels){
   if(assetSounds.has(handle))return;
   const frames=size/(2*channels);
@@ -53,7 +95,7 @@ function mask(){
 function setPaused(value){
   paused=value;keys.clear();touch.clear();pending=0;last=0;accumulator=0;
   $("#pause").textContent=paused?"Resume":"Pause";
-  status.textContent=(paused?"Paused · ":"")+titles[id];
+  status.textContent=(paused?"Paused · ":"")+(titles[id] || id);
   if(paused)stopSounds();else canvas.focus();
 }
 canvas.addEventListener("keydown",event=>{if(event.code in bindings){event.preventDefault();if(event.repeat && event.code==="Escape")return;if(!event.repeat)pending|=1<<bindings[event.code];keys.add(event.code);unlock();}});
@@ -72,8 +114,8 @@ document.querySelectorAll("[data-button]").forEach(button=>{
 function frame(now){
   if(leaving)return;
   const current=mask(),select=((current|pending)&(1<<11))!==0;
-  if(id==="hardware-test" && ((current|pending)&(1<<6))){leaving=true;location.href="./";return;}
-  if(select && !selectHeld && id!=="hardware-test")setPaused(!paused);
+  if(selectedGame?.role==="diagnostic" && ((current|pending)&(1<<6))){leaving=true;location.href="./";return;}
+  if(select && !selectHeld && selectedGame?.role!=="diagnostic")setPaused(!paused);
   selectHeld=(current&(1<<11))!==0;
   if(!paused){
     if(last)accumulator+=Math.min(now-last,100);
@@ -84,11 +126,22 @@ function frame(now){
 }
 async function checked(url){const response=await fetch(url,{cache:"no-store"});if(!response.ok)throw new Error(`Unable to load ${url} (${response.status})`);return response;}
 async function start(){
-  if(!Object.hasOwn(titles,id))throw new Error("Unknown game");
+  const catalogDocument=await (await checked("catalog.json")).json();
+  if(catalogDocument?.version!==1 || !Array.isArray(catalogDocument.games))throw new Error("Invalid game catalog");
+  catalog=catalogDocument.games;
+  if(!catalog.length || catalog.some(game=>!game || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(game.id) ||
+      typeof game.name!=="string" || !["game","diagnostic"].includes(game.role)))throw new Error("Invalid game catalog");
+  ids=catalog.map(game=>game.id);
+  if(new Set(ids).size!==ids.length)throw new Error("Invalid game catalog");
+  titles={launcher:"Launcher",...Object.fromEntries(catalog.map(game=>[game.id,game.name]))};
+  selectedGame=catalog.find(game=>game.id===id) || null;
+  if(id!=="launcher" && !selectedGame)throw new Error("Unknown game");
   const files=await (await checked("assets.json")).json();
   const configs=id==="launcher"?{}:await (await checked("configs.json")).json();
   const {default:create}=await import(`./${id}.js`);
   runtime=await create({canvas,onSound:playSound,onAssetReady:prepareAssetSound,onAssetSound:playAssetSound,
+    onDirectorConnect,onDirectorDisconnect,onDirectorEvent,onDirectorState,
+    onLauncherCount:()=>ids.length,onLauncherName:index=>titles[ids[index]],
     onLaunch:index=>{leaving=true;location.href=`?game=${ids[index]}`;},printErr:message=>console.warn(message)});
   await Promise.all(files.filter(file=>id==="launcher"?file.startsWith("assets/launcher/"):file.startsWith(`games/${id}/`)).map(async file=>{
     let bytes;
@@ -101,9 +154,10 @@ async function start(){
   }));
   const config=`games/${id}/game.conf`;
   const level=params.get("level");
-  if(id==="phosphor-run" && level && /^\d+$/.test(level)){
-    const text=runtime.FS.readFile(config,{encoding:"utf8"}).replace(/^start_level=.*$/m,"");
-    runtime.FS.writeFile(config,text+`\nstart_level=${Number(level)}\n`);
+  if(selectedGame?.levelSetting && level && /^\d+$/.test(level)){
+    const text=runtime.FS.readFile(config,{encoding:"utf8"});
+    const setting=selectedGame.levelSetting;
+    runtime.FS.writeFile(config,text.replace(new RegExp(`^${setting}=.*$`,"m"),"")+`\n${setting}=${Number(level)}\n`);
   }
   if(!runtime.ccall("web_init","number",["string"],[config]))throw new Error("Could not initialise the game or WebGL display");
   ready=true;

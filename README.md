@@ -35,18 +35,24 @@ part of Chirky's shared browser build.
 
 From the Chirky checkout, run `make web` and
 `node tools/export-web.cjs ../slimbuck.com` (adjust the destination path).
-On Windows, build with `wsl make web NODE=node.exe`. The export runs both games'
-desktop/mobile browser checks against the standalone build before replacing
-this site's `apps/chirky/` with identical files. It does not commit or publish.
+On Windows, build with `wsl make web NODE=node.exe`. The export checks every
+catalog entry through the launcher at desktop/mobile sizes, plus detailed
+Phosphor Run and Rosey Chop gameplay checks, before replacing this site's
+`apps/chirky/` with identical files. It does not commit or publish.
 Commit Chirky first and rebuild when preparing a release from a clean revision.
 
-Here, run `npm run build` and preview/check the result before committing and
-pushing. This site's build copies the entire bundle unchanged, including
+Here, run `npm test` and `npm run build`, then preview/check the result before
+committing and pushing. The build copies the entire bundle unchanged, including
 `configs.json`; `.gitattributes` prevents Git newline conversion from altering
-the tested bytes. No game server is required.
+the tested bytes. It validates every manifest hash, catalog module, and bundled
+configuration, and rejects dirty source revisions before publishing.
+No game server is required for local gameplay. Bramble Hollow's optional world
+director is configured separately; publishing the static bundle does not deploy
+that service or make its local network address publicly reachable.
 
 Deployment waits for cache invalidation and runs `tools/check-chirky.js` to
-verify all public game resources against the build. To check a local preview:
+verify every public file listed in the build manifest, including `catalog.json`
+and all catalog game modules, against the tested bytes. To check a local preview:
 `node tools/check-chirky.js http://127.0.0.1:8772/`.
 
 See [DEPLOY.md](DEPLOY.md) for content examples, manual deployment, and AWS setup.

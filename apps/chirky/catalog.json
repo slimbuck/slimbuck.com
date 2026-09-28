@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "games": [
+    {
+      "id": "bramble-hollow",
+      "name": "Bramble Hollow",
+      "description": "A gentle woodland adventure shaped by a tiny living-world director",
+      "role": "game"
+    },
+    {
+      "id": "phosphor-run",
+      "name": "Phosphor Run",
+      "description": "Restore the last signal in a collapsing broadcast tower",
+      "role": "game",
+      "levelSetting": "start_level"
+    },
+    {
+      "id": "rosey-chop",
+      "name": "Rosey Chop",
+      "description": "Chop the dead roses before the storm - dodge the wasps",
+      "role": "game"
+    },
+    {
+      "id": "hardware-test",
+      "name": "Hardware Test",
+      "description": "CRT colour, motion, audio, input, and capture checks",
+      "role": "diagnostic"
+    }
+  ]
+}

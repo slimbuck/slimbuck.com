@@ -25,34 +25,16 @@ For example, `content/projects/chirky.md` appears in `/projects/` and produces
 the standalone page `/projects/chirky.html`. An optional `embed: /apps/name/`
 front-matter field adds a playable app; its static files live in `apps/name/`.
 
-## Refresh the Chirky games
+## Chirky
 
-The playable build in `apps/chirky/` is owned and built by the
-[Chirky repository](https://github.com/slimbuck/chirky). Its `build.json` records
-the source commit, uncommitted-change status and exact file hashes. Do not edit
-the bundled player here: configuration bundling and iframe focus behaviour are
-part of Chirky's shared browser build.
+Chirky publishes independently at [chirky.org](https://chirky.org/). This site
+links to it from the project page. The historical `apps/chirky/` bundle is
+excluded from builds; its old root URL contains a redirect fallback that
+preserves game and level query parameters. No Chirky build is needed here.
 
-From the Chirky checkout, run `make web` and
-`node tools/export-web.cjs ../slimbuck.com` (adjust the destination path).
-On Windows, build with `wsl make web NODE=node.exe`. The export checks every
-catalog entry through the launcher at desktop/mobile sizes, plus detailed
-Phosphor Run and Rosey Chop gameplay checks, before replacing this site's
-`apps/chirky/` with identical files. It does not commit or publish.
-Commit Chirky first and rebuild when preparing a release from a clean revision.
-
-Here, run `npm test` and `npm run build`, then preview/check the result before
-committing and pushing. The build copies the entire bundle unchanged, including
-`configs.json`; `.gitattributes` prevents Git newline conversion from altering
-the tested bytes. It validates every manifest hash, catalog module, and bundled
-configuration, and rejects dirty source revisions before publishing.
-No game server is required for local gameplay. Bramble Hollow's optional world
-director is configured separately; publishing the static bundle does not deploy
-that service or make its local network address publicly reachable.
-
-Deployment waits for cache invalidation and runs `tools/check-chirky.js` to
-verify every public file listed in the build manifest, including `catalog.json`
-and all catalog game modules, against the tested bytes. To check a local preview:
-`node tools/check-chirky.js http://127.0.0.1:8772/`.
+`npm run build` checks the outgoing link and rejects a restored embed. Publish
+`aws/cf-rewrite.js` to the existing CloudFront viewer-request function to enable
+HTTP 301 redirects for old `/apps/chirky/` URLs and their query strings.
+Deploy these changes only after chirky.org has passed its release checks.
 
 See [DEPLOY.md](DEPLOY.md) for content examples, manual deployment, and AWS setup.

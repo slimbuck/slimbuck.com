@@ -50,7 +50,7 @@ aws cloudfront wait invalidation-completed \
     --distribution-id "${AWS_CLOUDFRONT_DISTRIBUTION_ID}" \
     --id "$invalidation_id"
 
-echo "==> Checking deployed Chirky assets"
-node tools/check-chirky.js https://slimbuck.com/
+echo "==> Checking Chirky link"
+node tools/check-chirky-link.js https://slimbuck.com/
 
 echo "==> Done. https://slimbuck.com/"

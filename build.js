@@ -495,7 +495,10 @@ const copyStaticAssets = () => {
             console.warn(`  ! skipping missing asset: ${asset}`);
             continue;
         }
-        fs.cpSync(src, out(asset), { recursive: true });
+        fs.cpSync(src, out(asset), {
+            recursive: true,
+            filter: source => source !== path.join(__dirname, 'apps', 'chirky'),
+        });
     }
 };
 
@@ -505,6 +508,9 @@ const main = () => {
     fs.mkdirSync(OUT_DIR, { recursive: true });
 
     copyStaticAssets();
+    // Preserve old bookmarks while Chirky publishes independently.
+    fs.mkdirSync(out('apps', 'chirky'), { recursive: true });
+    fs.copyFileSync(path.join(__dirname, 'redirects', 'chirky.html'), out('apps', 'chirky', 'index.html'));
 
     const collections = COLLECTIONS.map((cfg) => ({ cfg, items: readCollection(cfg) }));
 

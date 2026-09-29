@@ -7,6 +7,19 @@
 function handler(event) {
     var request = event.request;
     var uri = request.uri;
+    if (uri === '/apps/chirky' || uri.indexOf('/apps/chirky/') === 0) {
+        var suffix = uri === '/apps/chirky' ? '' : uri.substring('/apps/chirky/'.length);
+        var query = [];
+        Object.keys(request.querystring || {}).forEach(function (key) {
+            var entry = request.querystring[key];
+            (entry.multiValue || [entry]).forEach(function (item) {
+                query.push(key + '=' + item.value);
+            });
+        });
+        return { statusCode: 301, statusDescription: 'Moved Permanently', headers: {
+            location: { value: 'https://chirky.org/' + suffix + (query.length ? '?' + query.join('&') : '') }
+        }};
+    }
 
     if (uri.endsWith('/')) {
         request.uri = uri + 'index.html';

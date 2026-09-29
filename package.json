@@ -8,8 +8,8 @@
     "node": ">=22"
   },
   "scripts": {
-    "test": "node --test tools/check-chirky.test.js",
-    "build": "node build.js && node tools/check-chirky.js --local",
+    "test": "node --test tools/check-chirky.test.js tools/check-chirky-link.test.js",
+    "build": "node build.js && node tools/check-chirky-link.js --local",
     "serve": "node --run build && node tools/serve.js"
   },
   "author": "Donovan Hutchence",

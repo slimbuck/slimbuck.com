@@ -3,8 +3,6 @@ title: "Chirky"
 order: 0
 description: "A game console which runs on Raspberry PI + CRT + snes controller or in the browser."
 tags: ["games", "raspberry pi", "webassembly"]
-embed: "/apps/chirky/"
-embedHeight: 860
 ---
 After playing Mario on an original NES console in France, I was inspired to develop my own console.
 
@@ -21,7 +19,4 @@ Check the github repo for more details:
 
 https://github.com/slimbuck/chirky
 
-Choose a game in the launcher below. Click the game to focus it, use the arrow
-keys to move, and press **X** or **Enter** to select. Touch controls and standard
-browser gamepads are also supported. The browser version uses the same game code
-as the console.
+[Play Chirky on chirky.org](https://chirky.org/). The browser version uses the same game code as the console, with keyboard, gamepad and touch controls.

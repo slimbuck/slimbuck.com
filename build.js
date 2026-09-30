@@ -35,6 +35,7 @@ const STATIC_ASSETS = [
     'text.css',
     'blog.css',
     'icon.png',
+    'favicon.svg',
     '404.html',
     'robots.txt',
     'apps',
@@ -259,7 +260,7 @@ const layout = ({ title, description, canonical, headExtra = '', body, active = 
         <link rel="stylesheet" type="text/css" href="/style.css" />
         <link rel="stylesheet" type="text/css" href="/text.css" />
         <link rel="stylesheet" type="text/css" href="/blog.css" />
-        <link rel="icon" type="image/png" href="/icon.png">
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg">
         <link rel="alternate" type="application/rss+xml" title="${escapeHtml(SITE.title)} blog" href="/rss.xml">
 ${headExtra}
     </head>

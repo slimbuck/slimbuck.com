@@ -1,5 +1,5 @@
 ---
-title: "Chirky"
+title: "Chirky Box"
 order: 0
 description: "A game console which runs on Raspberry PI + CRT + snes controller or in the browser."
 tags: ["games", "raspberry pi", "webassembly"]
@@ -19,4 +19,4 @@ Check the github repo for more details:
 
 https://github.com/slimbuck/chirky
 
-[Play Chirky on chirky.org](https://chirky.org/). The browser version uses the same game code as the console, with keyboard, gamepad and touch controls.
+[Play Chirky Box on chirky.org](https://chirky.org/). The browser version uses the same game code as the console, with keyboard, gamepad and touch controls.

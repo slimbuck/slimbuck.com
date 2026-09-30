@@ -117,11 +117,11 @@ div.comments {
 }
 
 /* ---- Static content box (e.g. the about page) ---- */
-/* Matches the card look so its text aligns with the entry cards on other pages. */
+/* Warm paper keeps the framed content consistent with the site background. */
 div.panel {
 	margin: 14px 0;
 	padding: 8px 16px 14px;
-	background-color: var(--card);
+	background-color: var(--bg);
 	border: var(--border);
 	border-radius: var(--border-radius);
 	box-shadow: var(--shadow);

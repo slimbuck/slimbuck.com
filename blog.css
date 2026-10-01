@@ -133,15 +133,17 @@ div.panel > .text.post {
 
 /* ---- Contents list above the selected entry ---- */
 .entry-list {
-    margin: 14px 0 26px;
-    padding-bottom: 18px;
-    border-bottom: var(--border);
+    margin: 20px 0 28px;
+    padding: 8px;
+    background: var(--bg);
+    border: var(--border);
+    border-radius: var(--border-radius);
 }
 .entry-list ul {
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
-    gap: 8px 16px;
+    gap: 6px;
     list-style: none;
     margin: 0;
     padding: 0;
@@ -155,16 +157,24 @@ div.panel > .text.post {
 }
 .entry-list a {
     display: inline-block;
-    padding: 4px 8px;
+    padding: 7px 10px;
+    color: var(--ink);
     font-family: "Space Grotesk", sans-serif;
+    font-size: 0.9rem;
     font-weight: 700;
+    border: 2px solid transparent;
     border-radius: var(--border-radius);
+    text-decoration: none;
+}
+.entry-list a:hover {
+    background: var(--accent3);
+    border-color: var(--ink);
 }
 .entry-list a[aria-current] {
     color: var(--ink);
     background: var(--accent3);
-    text-decoration: underline;
-    text-underline-offset: 4px;
+    border-color: var(--ink);
+    box-shadow: 2px 2px 0 var(--ink);
 }
 .entry-list a:focus-visible {
     outline: 3px solid var(--accent2);

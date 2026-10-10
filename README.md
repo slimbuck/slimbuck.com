@@ -25,6 +25,14 @@ For example, `content/projects/chirky.md` appears in `/projects/` and produces
 the standalone page `/projects/chirky.html`. An optional `embed: /apps/name/`
 front-matter field adds a playable app; its static files live in `apps/name/`.
 
+## Layout and styling
+
+`build.js` renders the collection, About, and 404 pages through one shared
+layout and article container. `style.css` owns the site's typography,
+navigation, prose, and components. Its spacing variables control section
+gaps; prose rules control spacing inside Markdown content. The embedded apps
+also load `apps/controls.css` for their inputs, buttons, and canvases.
+
 ## Chirky
 
 Chirky publishes independently at [chirky.org](https://chirky.org/). This site

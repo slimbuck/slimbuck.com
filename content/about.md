@@ -10,22 +10,18 @@ social:
   - platform: linkedin
     url: https://www.linkedin.com/in/dhutchence/
 ---
-This is the personal website of Donovan Hutchence, aka **slimbuck**.
+This is the work-in-progress personal website of Donovan Hutchence, aka **slimbuck**. I am a software engineer and member of the [PlayCanvas](https://www.playcanvas.com) team at **Snap**.
 
-I am a software engineer and member of the [PlayCanvas](https://www.playcanvas.com) team at **Snap**.
+I work on realtime web tools and applications and have spent the last few years knee-deep in all aspects of [gaussian splatting](https://superspl.at).
 
-I work on realtime tools and applications and spent the last two years knee-deep in all aspects of [gaussian splatting](https://superspl.at).
-
----
+You can see my CV [here](/docs/dhutchencecv.pdf).
 
 ### About this site
 
-Now that LLMs can write everything for us, I decided it's the perfect opportunity to learn how to write for myself. In the process I hope to _find my written voice_.
+Since AI can now write anything and everything for us, I decided it's finally time to learn how to write for myself.
 
-So while this website is built (and deployed, and styled) with the help of opus and fable, all the words you read are mine, for better or worse.
+So while this website has been built (and deployed, and styled) with the help of agents, all the written words, for better or for worse, are mine.
 
 ---
-
-My [CV](/docs/dhutchencecv.pdf)
 
 {{social}}

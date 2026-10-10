@@ -1,0 +1,80 @@
+/* ---- Form controls (playtracer) ---- */
+
+input
+{
+	width: 60px;
+	padding: 6px;
+	margin: 0 6px;
+	color: var(--ink);
+	background-color: var(--card);
+	border: var(--border);
+	border-radius: var(--border-radius);
+	font-family: inherit;
+}
+
+input:focus
+{
+	background-color: var(--accent3);
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+	-moz-appearance: textfield;
+}
+
+button
+{
+	padding: 7px 16px;
+	color: var(--ink);
+	background-color: var(--card);
+	border: var(--border);
+	border-radius: var(--border-radius);
+	box-shadow: var(--shadow-sm);
+	cursor: pointer;
+	font-family: inherit;
+	font-weight: 700;
+}
+
+button:hover
+{
+	background-color: var(--accent2);
+	color: #fff;
+	transform: translate(-1px, -1px);
+}
+
+button:active
+{
+	transform: translate(2px, 2px);
+	box-shadow: none;
+}
+
+canvas
+{
+	margin: 12px 0;
+	background: #000;
+	max-width: 100%;
+	height: auto;
+	border: var(--border);
+	border-radius: var(--border-radius);
+}
+
+textarea
+{
+	margin: 12px 0;
+	background: var(--card);
+	color: var(--ink);
+	width: 100%;
+	max-width: 100%;
+	box-sizing: border-box;
+	border: var(--border);
+	border-radius: var(--border-radius);
+	padding: 8px;
+	font-family: inherit;
+}

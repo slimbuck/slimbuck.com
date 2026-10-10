@@ -1,22 +1,22 @@
 ---
 title: "Chirky Box"
 order: 0
-description: "A game console which runs on Raspberry PI + CRT + snes controller or in the browser."
-tags: ["games", "raspberry pi", "webassembly"]
+description: "My game console runs on Raspberry PI + browser. Supports KB & SNES controller."
+tags: ["games", "raspberry pi", "webassembly", "chirky"]
 ---
-After playing Mario on an original NES console in France, I was inspired to develop my own console.
+After playing Mario 1 on an original NES console in France, I was inspired to develop my own console.
 
-I wondered whether it's still possible to get that immediate-response feel using (partly) modern hardware.
+I wondered whether it's still possible to get that immediate-response feeling using (partly) modern hardware.
 
-My console comprises:
+I have built a console out of:
 - Raspberry PI 3 B+
 - Original SNES controller
 - Raspberry PI Pico (for controller to USB)
 - RGBerry (PI to scart converter)
 - 14" CRT TV
 
-Check the github repo for more details:
+I got Astra to compile the console to wasm and add browser support:
+[chirky.org](https://chirky.org/)
 
+The github repo has the code:
 https://github.com/slimbuck/chirky
-
-[Play Chirky Box on chirky.org](https://chirky.org/). The browser version uses the same game code as the console, with keyboard, gamepad and touch controls.

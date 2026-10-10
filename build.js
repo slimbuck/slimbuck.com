@@ -32,11 +32,9 @@ const out = (...p) => path.join(OUT_DIR, ...p);
 // pages. Everything else at the repo root is source or tooling.
 const STATIC_ASSETS = [
     'style.css',
-    'text.css',
-    'blog.css',
+    'navigation-trace.js',
     'icon.png',
     'favicon.svg',
-    '404.html',
     'robots.txt',
     'apps',
     'docs'
@@ -79,18 +77,18 @@ const PERSON_JSON_LD = {
 };
 
 // giscus comments (https://giscus.app), shared by both views of a blog entry.
-// Disabled until repoId AND categoryId are filled in â€” get both from the
+// Disabled until repoId AND categoryId are filled in — get both from the
 // configurator at https://giscus.app after enabling GitHub Discussions on the
 // repo and installing the giscus app. NOTE: the site's global COEP
 // (`require-corp`) header must be scoped to /apps/* first, or the browser will
-// refuse to load the giscus iframe (see DEPLOY.md Â§8).
+// refuse to load the giscus iframe (see DEPLOY.md §8).
 const GISCUS = {
     repo: 'slimbuck/slimbuck.com',
     repoId: 'MDEwOlJlcG9zaXRvcnkyNDQxNTMxMTc=',
     category: 'General',
     categoryId: 'DIC_kwDODo17Hc4DAs9g',
-    mapping: 'specific',
-    theme: 'light',
+    mapping: 'pathname',
+    theme: 'noborder_light',
     reactionsEnabled: '0',
     inputPosition: 'bottom',
     lang: 'en'
@@ -134,8 +132,7 @@ const COLLECTIONS = [
         permalinkBase: '/blog',
         canonical: SITE.url + '/',
         heading: 'Blog',
-        intro: 'Occasional notes on graphics, games and software engineering.',
-        indexTitle: 'Donovan Hutchence (slimbuck) â€” Blog',
+        indexTitle: 'Donovan Hutchence (slimbuck) — Blog',
         indexDescription: SITE.description,
         sitemapPriority: '1.0'
     },
@@ -148,8 +145,7 @@ const COLLECTIONS = [
         permalinkBase: '/work',
         canonical: SITE.url + '/work/',
         heading: 'Work',
-        intro: 'I am fortunate to work on open source projects much of time at PlayCanvas. These are some of those projects.',
-        indexTitle: 'Work â€” Donovan Hutchence (slimbuck)',
+        indexTitle: 'Work — Donovan Hutchence (slimbuck)',
         indexDescription: 'Open-source graphics and Gaussian splatting projects Donovan Hutchence works on at PlayCanvas.',
         sitemapPriority: '0.8'
     },
@@ -163,8 +159,7 @@ const COLLECTIONS = [
         permalinkBase: '/projects',
         canonical: SITE.url + '/projects/',
         heading: 'Projects',
-        intro: 'Interactive experiments that run in your browser.',
-        indexTitle: 'Projects â€” Donovan Hutchence (slimbuck)',
+        indexTitle: 'Projects — Donovan Hutchence (slimbuck)',
         indexDescription: 'Browser-based graphics experiments by Donovan Hutchence, written in C++ and compiled to WebAssembly.',
         sitemapPriority: '0.8'
     }
@@ -236,7 +231,7 @@ const NAV = [
 // `active` highlights the current tab (home | work | projects | about).
 const layout = ({ title, description, canonical, headExtra = '', body, active = null }) => {
     const nav = NAV
-        .map((n) => `            <a href="${n.href}"${n.key === active ? ' class="active"' : ''}>${n.label}</a>`)
+        .map((n) => `            <a href="${n.href}"${n.key === active ? ' class="active" aria-current="true"' : ''}>${n.label}</a>`)
         .join('\n');
     return `<!doctype html>
 <html lang="en">
@@ -258,21 +253,23 @@ const layout = ({ title, description, canonical, headExtra = '', body, active = 
         <meta name="twitter:site" content="${SITE.authorHandle}">
 
         <link rel="stylesheet" type="text/css" href="/style.css" />
-        <link rel="stylesheet" type="text/css" href="/text.css" />
-        <link rel="stylesheet" type="text/css" href="/blog.css" />
+        <script src="/navigation-trace.js" defer></script>
         <link rel="icon" type="image/svg+xml" href="/favicon.svg">
         <link rel="alternate" type="application/rss+xml" title="${escapeHtml(SITE.title)} blog" href="/rss.xml">
 ${headExtra}
     </head>
     <body>
-        <div class="header">
+        <a class="skip-link" href="#main">Skip to content</a>
+        <header class="header">
             <h1><a href="/">slimbuck.com</a></h1>
+            <nav class="site-nav" aria-label="Main">
 ${nav}
-        </div>
-        <div class="content">
+            </nav>
+        </header>
+        <main id="main" class="content page-stack" tabindex="-1">
 ${body}
-            <div class="footer"></div>
-        </div>
+        </main>
+        <div class="footer" aria-hidden="true"></div>
     </body>
 </html>
 `;
@@ -325,8 +322,18 @@ const renderEntryList = (cfg, items, selected) => items.length ? `
             <nav class="entry-list" aria-label="${escapeHtml(cfg.name)} entries">
                 <ul>${items.map((item) => `
                     <li><a href="${cfg.permalinkBase}/${item.slug}.html"${item.slug === selected ? ' aria-current="true"' : ''}>${escapeHtml(item.title)}</a>${item.date ? ` <span class="entry-date">${formatDate(item.date)}</span>` : ''}</li>`).join('')}
+${cfg.rss ? '                    <li><a href="/rss.xml">RSS feed</a></li>' : ''}
                 </ul>
             </nav>` : '';
+
+// Every article uses the same heading and prose container. Navigation supplies
+// the visible title; the hidden heading preserves heading navigation.
+const renderArticle = (title, html, { visibleTitle = false } = {}) => `            <article aria-labelledby="article-title">
+                <h2 id="article-title" class="${visibleTitle ? 'page-title' : 'visually-hidden'}">${escapeHtml(title)}</h2>
+                <div class="prose">
+${html}
+                </div>
+            </article>`;
 
 const renderEntry = (cfg, item) => {
     const meta = item.date ? `<p class="post-meta">Posted ${formatDate(item.date)}</p>` : '';
@@ -347,27 +354,14 @@ const renderEntry = (cfg, item) => {
                     }
                 </script>` : player;
     const comments = cfg.name === 'blog' ? renderGiscus(item) : '';
-    return `            <article class="selected-entry">
-                <div class="heading"><h2>${escapeHtml(item.title)}</h2></div>
-                <div class="text post">
-                    ${meta}${item.html}${embed}
-                    ${renderTags(item.tags)}
-                </div>
-            </article>${comments ? '\n' + comments : ''}`;
-};
-
-const renderCollectionIntro = (cfg) => {
-    const rssLink = cfg.rss ? ' <a href="/rss.xml">RSS feed</a>' : '';
-    return `            <div class="text">
-                <p>${cfg.intro}${rssLink}</p>
-            </div>`;
+    return renderArticle(item.title, `${meta}${item.html}${embed}${renderTags(item.tags)}`) +
+        (comments ? '\n' + comments : '');
 };
 
 const renderIndex = (cfg, items) => {
     const selected = items[0];
-    const body = `${renderCollectionIntro(cfg)}
-${renderEntryList(cfg, items, selected?.slug)}
-${selected ? renderEntry(cfg, selected) : '            <div class="text">Nothing here yet â€” check back soon.</div>'}`;
+    const body = `${renderEntryList(cfg, items, selected?.slug)}
+${selected ? renderEntry(cfg, selected) : '            <div class="prose">Nothing here yet — check back soon.</div>'}`;
 
     return layout({
         title: cfg.indexTitle,
@@ -396,12 +390,11 @@ const renderPermalink = (cfg, item, items) => {
         });
     }
 
-    const body = `${renderCollectionIntro(cfg)}
-${renderEntryList(cfg, items, item.slug)}
+    const body = `${renderEntryList(cfg, items, item.slug)}
 ${renderEntry(cfg, item)}`;
 
     return layout({
-        title: `${item.title} Â· ${SITE.title}`,
+        title: `${item.title} · ${SITE.title}`,
         description: item.description,
         canonical: item.url,
         headExtra,
@@ -418,13 +411,9 @@ const renderAbout = () => {
         .parse(content)
         .replace(/<p>\s*\{\{social\}\}\s*<\/p>/, socialRow)
         .replace(/\{\{social\}\}/, socialRow);
-    const body = `            <div class="panel">
-                <div class="text post">
-${rendered}
-                </div>
-            </div>`;
+    const body = renderArticle(data.title || 'About', rendered);
     return layout({
-        title: `${data.title || 'About'} â€” Donovan Hutchence (slimbuck)`,
+        title: `${data.title || 'About'} — Donovan Hutchence (slimbuck)`,
         description: data.description || SITE.description,
         canonical: SITE.url + '/about/',
         headExtra: data.person ? jsonLdScript(PERSON_JSON_LD) : '',
@@ -432,6 +421,15 @@ ${rendered}
         body
     });
 };
+
+const renderNotFound = () => layout({
+    title: 'Page not found — slimbuck',
+    description: 'The page you were looking for could not be found.',
+    canonical: SITE.url + '/404.html',
+    headExtra: '        <meta name="robots" content="noindex">',
+    body: renderArticle('404 — page not found', `<p>Well, this is awkward. The page you were looking for isn't here.</p>
+<p>Try heading back to the <a href="/">home page</a>.</p>`, { visibleTitle: true })
+});
 
 const renderRss = (posts) => {
     const items = posts
@@ -530,6 +528,7 @@ const main = () => {
 
     fs.mkdirSync(out('about'), { recursive: true });
     fs.writeFileSync(out('about', 'index.html'), renderAbout());
+    fs.writeFileSync(out('404.html'), renderNotFound());
 
     const blog = collections.find((c) => c.cfg.name === 'blog');
     fs.writeFileSync(out('rss.xml'), renderRss(blog ? blog.items : []));

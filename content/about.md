@@ -10,7 +10,7 @@ social:
   - platform: linkedin
     url: https://www.linkedin.com/in/dhutchence/
 ---
-This is the website of Donovan Hutchence, aka **slimbuck**. I am a software engineer and member of the [PlayCanvas](https://www.playcanvas.com) team at [**Snap**](https://www.snap.com/).
+This is the website of Donovan Hutchence, aka [**slimbuck**](https://github.com/slimbuck). I am a software engineer and member of the [PlayCanvas](https://www.playcanvas.com) team at [**Snap**](https://www.snap.com/).
 
 I build real-time tools and technology and have spent the last few years knee-deep in all aspects of [gaussian splatting](https://superspl.at).
 

@@ -192,12 +192,11 @@ a:hover { color: var(--accent); text-decoration: underline; }
 .prose li + li { margin-top: var(--space-1); }
 .prose hr { border: 0; border-top: var(--border); margin-block: var(--space-3); }
 .prose hr + * { margin-top: 0; }
-.prose table { width: 100%; border-collapse: collapse; background: rgba(255, 255, 255, 0.4); }
-.prose :is(th, td) { padding: 14px var(--space-2); text-align: left; vertical-align: top; }
-.prose th { padding-top: 0; font-weight: 700; border-bottom: 2px solid var(--ink); }
+.prose table { width: 100%; border-collapse: separate; border-spacing: 0; background: rgba(255, 255, 255, 0.4); border-radius: 8px; overflow: hidden; }
+.prose :is(th, td) { padding: 8px 12px; text-align: left; vertical-align: top; }
+.prose th { font-weight: 700; border-bottom: 2px solid var(--ink); }
 .prose td { border-bottom: 1px solid rgba(14, 14, 14, 0.2); }
-.prose :is(th, td):first-child { padding-left: 0; }
-.prose :is(th, td):last-child { padding-right: 0; }
+.prose tbody tr:last-child td { border-bottom: 0; }
 .prose td:first-child { font-weight: 500; }
 .prose img { display: block; max-width: 100%; height: auto; border: var(--border); border-radius: var(--border-radius); }
 .prose:has(.project-mascot) { display: flow-root; }

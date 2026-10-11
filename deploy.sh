@@ -53,4 +53,7 @@ aws cloudfront wait invalidation-completed \
 echo "==> Checking Chirky link"
 node tools/check-chirky-link.js https://slimbuck.com/
 
+echo "==> Checking embedded player headers"
+node tools/check-embed-headers.js https://slimbuck.com/
+
 echo "==> Done. https://slimbuck.com/"

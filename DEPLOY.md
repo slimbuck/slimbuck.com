@@ -119,10 +119,9 @@ role via OIDC, so there are no long-lived secrets.
   REST origin).
 - **COOP/COEP headers**: Playtracer and HASTY use threads/`SharedArrayBuffer`,
   which need `Cross-Origin-Opener-Policy: same-origin` and
-  `Cross-Origin-Embedder-Policy: require-corp`. These currently apply to the
-  whole site via a response-headers policy on the default behavior. That's fine
-  unless you enable comments — see §8, which scopes them to `/apps/*` so the
-  giscus iframe can load on blog pages.
+  `Cross-Origin-Embedder-Policy: require-corp`. These apply to `/apps/*` and
+  `/projects/*`, so both players and their parent pages are isolated.
+  The default behavior remains non-isolated so giscus can load on blog pages.
 
 ## 5. Which branch is deployed?
 
@@ -211,12 +210,12 @@ social-icon row built from the `social:` list in its front matter.
 
 HASTY uses `embedAspect: 1` for a responsive square player and
 `requiresIsolation: true`. If the parent project page is not isolated, it shows
-a standalone Play link instead of starting a broken iframe. To enable inline
-play in production, add a CloudFront **`/projects/*`** behavior with the same
-COOP/COEP response-headers policy, origin, cache policy and viewer-request
-rewrite function as `/apps/*`, then invalidate `/projects/*`. Keep blog/default
-pages non-isolated for giscus. The preview enables this configuration; the live
-site uses the standalone fallback until the CloudFront behavior is configured.
+a standalone Play link instead of starting a broken iframe. Production has a
+CloudFront **`/projects/*`** behavior with the same COOP/COEP response-headers
+policy, origin, cache policy and viewer-request rewrite function as `/apps/*`.
+Keep blog/default pages non-isolated for giscus. The deployment checks the
+headers on both project pages and both players using
+`node tools/check-embed-headers.js https://slimbuck.com/`.
 
 ---
 
@@ -257,21 +256,22 @@ IDs below are filled in.
 
 ### Required: scope the isolation headers (or giscus won't load)
 
-The site currently returns `Cross-Origin-Embedder-Policy: require-corp` (and
-`Cross-Origin-Opener-Policy: same-origin`) on **every** response. Under
+Under
 `require-corp` the browser refuses to load the cross-origin giscus iframe, so
-comments silently fail. Only Playtracer/HASTY actually need those headers (for
-`SharedArrayBuffer`/threads), so scope them to `/apps/*`:
+comments silently fail. Playtracer/HASTY need those headers (for
+`SharedArrayBuffer`/threads). The live configuration scopes them to `/apps/*`
+and `/projects/*`. To reproduce this setup:
 
 1. CloudFront → your distribution → **Behaviors**.
 2. Create a new behavior with **Path pattern `/apps/*`** and attach the existing
    response-headers policy that sets COOP/COEP (leave everything else matching
    the default behavior — same origin, cache policy, and the `slimbuck-rewrite`
-   function on viewer-request).
+   function on viewer-request). Create a matching `/projects/*` behavior for
+   the parent pages.
 3. Edit the **Default (`*`)** behavior to use a response-headers policy
    *without* COOP/COEP (e.g. the AWS managed `SecurityHeadersPolicy`, or a
    custom one).
 4. Create an invalidation for `/*`.
 
-After this, `/apps/*` stays cross-origin isolated while blog pages drop the
+After this, `/apps/*` and `/projects/*` stay cross-origin isolated while blog pages omit the
 headers so giscus (and any future third-party embed) works.

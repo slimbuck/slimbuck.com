@@ -22,6 +22,4 @@ Since AI can now write anything and everything for us, I decided it's finally ti
 
 So while this website has been built (and deployed, and styled) with the help of agents, all the written words, for better or for worse, are mine.
 
----
-
 {{social}}

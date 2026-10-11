@@ -11,6 +11,4 @@ conversion, it includes:
 - **Decimation**
 - **Rasterization**
 
-**TOOD**
-
 [GitHub](https://github.com/playcanvas/splat-transform)

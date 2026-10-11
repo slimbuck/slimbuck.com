@@ -23,7 +23,10 @@
 
         <style>
             html.embedded .header, html.embedded .footer, html.embedded .heading { display: none; }
-            html.embedded, html.embedded body { margin: 0; width: 100%; }
+            html.embedded, html.embedded body { margin: 0; padding: 0; width: 100%; min-height: 0; background: transparent; }
+            html.embedded { overflow: hidden; }
+            html.embedded body { display: flow-root; }
+            html.embedded canvas { display: block; border: 0; border-radius: 0; }
         </style>
         <script>if (window.self !== window.top) document.documentElement.classList.add('embedded');</script>
     </head>

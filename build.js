@@ -35,6 +35,7 @@ const STATIC_ASSETS = [
     'navigation-trace.js',
     'icon.png',
     'favicon.svg',
+    'images',
     'robots.txt',
     'apps',
     'docs'
@@ -338,8 +339,8 @@ ${html}
 const renderEntry = (cfg, item) => {
     const meta = item.date ? `<p class="post-meta">Posted ${formatDate(item.date)}</p>` : '';
     const player = item.embed ? `
-                <div class="app-embed" style="${item.embedAspect ? `aspect-ratio:${item.embedAspect}` : `height:${item.embedHeight}px`}"><iframe src="${item.embed}" title="${escapeHtml(item.title)}" allowfullscreen></iframe></div>
-                <p><a href="${item.embed}" target="_blank" rel="noopener">Open in a new tab &#8599;</a></p>` : '';
+                <div class="app-embed" style="${item.embedAspect ? `aspect-ratio:${item.embedAspect}` : `height:${item.embedHeight}px`}"><iframe${item.embedAspect ? '' : ' data-auto-height'} src="${item.embed}" title="${escapeHtml(item.title)}" allowfullscreen></iframe></div>
+                ${item.embedAspect ? '' : '<script src="/apps/resize-embed.js" defer></script>'}` : '';
     // Threaded games cannot run inside a non-isolated parent page. Keep a
     // working standalone launch link until hosting enables isolation here too.
     const embed = item.requiresIsolation ? `

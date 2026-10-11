@@ -16,3 +16,5 @@ Space: drop piece
 q, w, e, a, s, d: rotate piece
 Up, down, left, right: move piece
 Enter: ui select
+
+---
